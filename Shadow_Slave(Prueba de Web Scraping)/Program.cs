@@ -74,11 +74,9 @@ namespace Shadow_Slave_Prueba_de_Web_Scraping_
             bool esta = false;
 
             string b;
-            string a = Directory.GetCurrentDirectory();
+            string a = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
-            a = Directory.GetParent(a).FullName;
-            a = Directory.GetParent(a).FullName;
-            a = Directory.GetParent(a).FullName;
+            a = Path.Combine(a, "Shadow Slave");
             b = a;
 
             a = Path.Combine(a, "Capitulos");
@@ -86,12 +84,20 @@ namespace Shadow_Slave_Prueba_de_Web_Scraping_
             
 
             List<int> exists_caps = new List<int>();
-
-            string[] h = Directory.GetFiles(a);
-            for (int i = 1; i <= h.Length; i++)
+            string[] h;
+            try
             {
-                int number = Convert.ToInt32(Path.GetFileName(h[i - 1]).Replace(".txt", ""));
-                exists_caps.Add(number);
+                h = Directory.GetFiles(a);
+                for (int i = 1; i <= h.Length; i++)
+                {
+                    int number = Convert.ToInt32(Path.GetFileName(h[i - 1]).Replace(".txt", ""));
+                    exists_caps.Add(number);
+                }
+            }
+            catch (Exception)
+            {
+                Directory.CreateDirectory(a);
+
             }
 
             Console.WriteLine("Bienvenido a la libreria de Shadow Slave");
