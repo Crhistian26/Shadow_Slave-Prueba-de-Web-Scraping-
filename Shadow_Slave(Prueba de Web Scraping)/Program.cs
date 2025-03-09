@@ -73,12 +73,17 @@ namespace Shadow_Slave_Prueba_de_Web_Scraping_
             string UltimoCapitulo;
             bool esta = false;
 
+            string b;
             string a = Directory.GetCurrentDirectory();
 
             a = Directory.GetParent(a).FullName;
-            a= Directory.GetParent(a).FullName;
             a = Directory.GetParent(a).FullName;
+            a = Directory.GetParent(a).FullName;
+            b = a;
+
             a = Path.Combine(a, "Capitulos");
+
+            
 
             List<int> exists_caps = new List<int>();
 
@@ -98,9 +103,23 @@ namespace Shadow_Slave_Prueba_de_Web_Scraping_
                     caps++;
                 }
 
+                try
+                {
+                    UltimoCapitulo = File.ReadAllText(Path.Combine(b, "Ultimo" + ".txt"));
+                }
+                catch (Exception)
+                {
+                    UltimoCapitulo = "Ninguno";
+
+                    File.WriteAllText(Path.Combine(b, "Ultimo" + ".txt"), "Ninguno");
+                }
+                
+
                 Console.WriteLine("Capitulos Disponibles: " + caps);
                 
-                Console.WriteLine("Capitulos mas reciente: " +  exists_caps.Max());
+                Console.WriteLine("Capitulo mas reciente: " +  exists_caps.Max());
+
+                Console.WriteLine("Ultimo capitulo leido: " + UltimoCapitulo);
 
             }
             else
@@ -125,13 +144,20 @@ namespace Shadow_Slave_Prueba_de_Web_Scraping_
                 }
                 else
                 {
-                    int start = exists_caps.Where(caps => caps < cap).Max();
+                    if (cap > 1)
+                    {
+                        int start = exists_caps.Where(caps => caps < cap).Max();
 
-                    Capitulo referencia = new Capitulo();
-                    var file = File.ReadAllLines(Path.Combine(a, start + ".txt"));
-                    referencia = JsonSerializer.Deserialize<Capitulo>(file[0]);
+                        Capitulo referencia = new Capitulo();
+                        var file = File.ReadAllLines(Path.Combine(a, start + ".txt"));
+                        referencia = JsonSerializer.Deserialize<Capitulo>(file[0]);
 
-                    capitulo = SearchCap(start, cap, referencia.Siguiente_URL);
+                        capitulo = SearchCap(start, cap, referencia.Siguiente_URL);
+                    }
+                    else
+                    {
+                        capitulo = GetCapitulo(url);
+                    }
                 }
 
                 Console.SetCursorPosition(0, 1);
@@ -152,6 +178,8 @@ namespace Shadow_Slave_Prueba_de_Web_Scraping_
                     string ruth = Path.Combine(a, capnumber + ".txt");
                     File.WriteAllText(ruth, CapSerialise);
                 }
+
+                File.WriteAllText(Path.Combine(b, "Ultimo" + ".txt"),cap.ToString());
 
                 do
                 { 
